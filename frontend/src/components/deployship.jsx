@@ -174,32 +174,42 @@ function BattlePage({ playerGrid, onBack }) {
     </div>
   );
 
-  return (
-    <div className="flex flex-col items-center bg-blue-900 min-h-screen p-6 text-white">
-      <h2 className="text-2xl font-bold mb-4">Battle Phase</h2>
-      <h3 className="text-lg mb-2">{winner ? winner : playerTurn ? "Your Turn" : "Enemy Turn"}</h3>
+ return (
+  <div className="flex flex-col items-center bg-blue-900 min-h-screen p-6 text-white">
+    <h2 className="text-2xl font-bold mb-4">Battle Phase</h2>
+    <h3 className="text-lg mb-2">{winner ? winner : playerTurn ? "Your Turn" : "Enemy Turn"}</h3>
 
-      <div className="grid grid-cols-2 gap-10">
-        <div>
-          <h4 className="mb-2">Opponent Grid</h4>
-          {renderGrid(enemyGrid, playerShots, true, sunkEnemyCells)}
-        </div>
-        <div>
-          <h4 className="mb-2">Your Grid</h4>
-          {renderGrid(playerGrid, enemyHits, false, sunkPlayerCells)}
-        </div>
+    <div className="grid grid-cols-2 gap-10">
+      <div>
+        <h4 className="mb-2">Opponent Grid</h4>
+        {renderGrid(enemyGrid, playerShots, true, sunkEnemyCells)}
       </div>
-
-      {winner && (
-        <button
-          onClick={onBack}
-          className="mt-6 bg-green-600 px-4 py-2 rounded shadow-md"
-        >
-          🔁 Restart
-        </button>
-      )}
+      <div>
+        <h4 className="mb-2">Your Grid</h4>
+        {renderGrid(playerGrid, enemyHits, false, sunkPlayerCells)}
+      </div>
     </div>
-  );
+
+    {/* Leave button always visible */}
+    <button
+      onClick={onBack}
+      className="mt-4 bg-red-600 hover:bg-red-700 px-4 py-2 rounded shadow-md"
+    >
+      🚪 Leave Battle
+    </button>
+
+    {/* Restart button only if there's a winner */}
+    {winner && (
+      <button
+        onClick={onBack}
+        className="mt-4 bg-green-600 hover:bg-green-700 px-4 py-2 rounded shadow-md"
+      >
+        🔁 Restart
+      </button>
+    )}
+  </div>
+);
+
 }
 
 export default function DeployYourShip() {
@@ -272,44 +282,68 @@ export default function DeployYourShip() {
   }} />;
 
   return (
-    <DndProvider backend={HTML5Backend}>
-      <div className="flex flex-col items-center p-4 bg-blue-900 min-h-screen">
-        <h1 className="text-white text-2xl font-bold mb-4">DEPLOY YOUR SHIP</h1>
-        <div className="grid grid-cols-10 gap-1 border border-blue-300">
-          {grid.map((row, y) =>
-            row.map((_, x) => (
-              <Cell key={`${x}-${y}`} x={x} y={y} grid={grid} handleDrop={handleDrop} />
-            ))
-          )}
-        </div>
+   <DndProvider backend={HTML5Backend}>
+  <div className="flex flex-row justify-center p-4 bg-blue-900 min-h-screen text-white gap-10">
 
-        <div className="flex mt-6 gap-4 bg-blue-800 p-4 rounded-xl shadow-xl">
-          {shipTypes.map((ship, idx) => (
-            <Ship key={idx} ship={ship} index={idx} isUsed={usedShips[idx]} isVertical={isVertical} />
-          ))}
-        </div>
+    {/* Left Side: Logo & Rules */}
+    <div className="w-1/4 flex flex-col gap-6">
+      <h1 className="text-4xl font-bold animate-pulse text-yellow-400 drop-shadow-lg tracking-wider">
+        🚢 BATTLESHIP
+      </h1>
 
-        <div className="mt-4 flex gap-4">
-          <button
-            onClick={() => setStartBattle(true)}
-            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded mr-2"
-          >
-            ✔ Confirm
-          </button>
-          <button
-            onClick={autoPlaceShips}
-            className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded"
-          >
-            Auto
-          </button>
-          <button
-            onClick={() => setIsVertical(!isVertical)}
-            className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded"
-          >
-            Rotate: {isVertical ? "Horizontal" : "Vertical"}
-          </button>
-        </div>
+      <div className="bg-blue-800 p-4 rounded-lg text-sm shadow-md">
+        <h2 className="font-semibold text-lg mb-2">📝 Rules:</h2>
+        <ul className="list-disc list-inside space-y-1">
+          <li>Drag and drop all ships onto the grid.</li>
+          <li>Use the "Rotate" button to switch orientation before placing.</li>
+          <li>Click "Auto" to place all ships randomly.</li>
+          <li>Click "Confirm" when all ships are placed to start the battle.</li>
+          <li>Sink all enemy ships before yours are sunk to win!</li>
+        </ul>
       </div>
-    </DndProvider>
+    </div>
+
+    {/* Right Side: Grid & Controls */}
+    <div className="flex flex-col items-center">
+      <h1 className="text-2xl font-bold mb-4">DEPLOY YOUR SHIP</h1>
+
+      <div className="grid grid-cols-10 gap-1 border border-blue-300">
+        {grid.map((row, y) =>
+          row.map((_, x) => (
+            <Cell key={`${x}-${y}`} x={x} y={y} grid={grid} handleDrop={handleDrop} />
+          ))
+        )}
+      </div>
+
+      <div className="flex mt-6 gap-4 bg-blue-800 p-4 rounded-xl shadow-xl">
+        {shipTypes.map((ship, idx) => (
+          <Ship key={idx} ship={ship} index={idx} isUsed={usedShips[idx]} isVertical={isVertical} />
+        ))}
+      </div>
+
+      <div className="mt-4 flex gap-4">
+        <button
+          onClick={() => setStartBattle(true)}
+          className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded mr-2"
+        >
+          ✔ Confirm
+        </button>
+        <button
+          onClick={autoPlaceShips}
+          className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded"
+        >
+          Auto
+        </button>
+        <button
+          onClick={() => setIsVertical(!isVertical)}
+          className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded"
+        >
+          Rotate: {isVertical ? "Horizontal" : "Vertical"}
+        </button>
+      </div>
+    </div>
+  </div>
+</DndProvider>
+
   );
 }
